@@ -1,0 +1,34 @@
+{
+    "name": "@chandancr/nltest",
+    "version": "1.0.0",
+    "description": "Tly - AI-powered natural language API testing CLI. Write tests in plain English and run them via CLI.",
+    "main": "src/index.js",
+    "bin": {
+        "nltest": "./bin/nltest.js"
+    },
+    "type": "module",
+    "scripts": {
+        "dev": "node bin/nltest.js",
+        "test": "node bin/nltest.js run"
+    },
+    "keywords": [
+        "api-testing",
+        "ai-testing",
+        "cli",
+        "openai",
+        "automation",
+        "natural-language"
+    ],
+    "author": "Chandan C R",
+    "license": "MIT",
+    "dependencies": {
+        "axios": "^1.7.4",
+        "chalk": "^5.3.0",
+        "commander": "^12.0.0",
+        "dotenv": "^17.2.3",
+        "openai": "^4.1.0"
+    },
+    "engines": {
+        "node": ">=18"
+    }
+}
