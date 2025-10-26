@@ -1,15 +1,15 @@
 {
-    "name": "@chandancr/nltest",
+    "name": "@chandancr/tstai",
     "version": "1.0.0",
     "description": "Tly - AI-powered natural language API testing CLI. Write tests in plain English and run them via CLI.",
     "main": "src/index.js",
     "bin": {
-        "nltest": "./bin/nltest.js"
+        "tstai": "./bin/tstai.js"
     },
     "type": "module",
     "scripts": {
-        "dev": "node bin/nltest.js",
-        "test": "node bin/nltest.js run"
+        "dev": "node bin/tstai.js",
+        "test": "node bin/tstai.js run"
     },
     "keywords": [
         "api-testing",
@@ -30,5 +30,10 @@
     },
     "engines": {
         "node": ">=18"
+    },
+    "devDependencies": {
+        "chai": "^6.2.0",
+        "mocha": "^11.7.4",
+        "supertest": "^7.1.4"
     }
 }

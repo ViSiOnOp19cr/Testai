@@ -1,10 +1,9 @@
-#!/usr/bin/env node
 import { program } from "commander";
 import path from "path";
 import { runTestsFromFile } from "../src/runner.js";
 
 program
-  .name("nltest")
+  .name("tstai")
   .description("Run AI-powered API tests written in natural language")
   .version("1.0.0");
 
