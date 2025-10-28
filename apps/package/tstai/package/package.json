@@ -1,15 +1,16 @@
 {
-    "name": "@chandancr/tstai",
-    "version": "1.0.0",
+    "name": "tstai-cli",
+    "version": "1.0.2",
     "description": "Tly - AI-powered natural language API testing CLI. Write tests in plain English and run them via CLI.",
     "main": "src/index.js",
     "bin": {
-        "tstai": "./bin/tstai.js"
+        "tstai": "bin/tstai.js"
     },
     "type": "module",
     "scripts": {
         "dev": "node bin/tstai.js",
-        "test": "node bin/tstai.js run"
+        "test": "node bin/tstai.js run",
+        "test:traditional": "mocha tests/example.traditional.js"
     },
     "keywords": [
         "api-testing",

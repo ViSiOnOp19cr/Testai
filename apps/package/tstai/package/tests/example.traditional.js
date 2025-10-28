@@ -5,7 +5,6 @@ const baseurl = 'https://jsonplaceholder.typicode.com';
 
 describe('JSONPlaceholder API Tests', () => {
   
-  // Test 1: GET /posts endpoint returns 200 and list of posts
   it('should get posts and return 200 status', async () => {
     const response = await request(baseurl)
       .get('/posts')
@@ -64,7 +63,7 @@ describe('JSONPlaceholder API Tests', () => {
   });
 
   // Test 5: GET /posts/999999 returns 404 not found
-  it('should return 201 for non-existent post', async () => {
+  it('should return 404 for non-existent post', async () => {
     await request(baseurl)
       .get('/posts/999999')
       .expect(404);

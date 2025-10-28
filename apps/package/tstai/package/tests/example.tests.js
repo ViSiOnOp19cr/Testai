@@ -18,6 +18,6 @@ name_app("Test GET /posts with query parameter userId=1, expect status 200", {
   baseurl,
 });
 
-name_app("Test GET /posts/999999 returns 201 not found", {
+name_app("Test GET /posts/999999 returns 404 not found", {
   baseurl,
 });

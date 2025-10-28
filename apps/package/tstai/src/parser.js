@@ -5,6 +5,7 @@ dotenv.config();
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function parseInstruction(instruction) {
+  // call an API TO MY BACKEND HERE BABY. 
   const completion = await client.chat.completions.create({
     model: "gpt-4",
     messages: [

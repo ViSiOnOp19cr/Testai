@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { program } from "commander";
 import path from "path";
 import { runTestsFromFile } from "../src/runner.js";
@@ -10,9 +11,12 @@ program
 program
   .command("run [file]")
   .description("Run test file")
-  .action(async (file) => {
+  .option("--logs", "Generate logs for all tests")
+  .option("--logs-failed", "Generate logs for failed tests only")
+  .action(async (file, options) => {
     const filePath = path.resolve(process.cwd(), file || "tests/example.tests.js");
-    await runTestsFromFile(filePath);
+    await runTestsFromFile(filePath,options);
   });
+
 
 program.parse(process.argv);
