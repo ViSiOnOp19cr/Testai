@@ -1,5 +1,5 @@
 {
-  "name": "zest",
+  "name": "tstai",
   "private": true,
   "scripts": {
     "build": "turbo run build",

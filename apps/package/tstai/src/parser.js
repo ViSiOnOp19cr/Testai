@@ -1,50 +1,53 @@
-import OpenAI from "openai";
-import dotenv from "dotenv";
-dotenv.config();  
-
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+import { getApiKey, getApiConfig } from "./auth.js";
 
 export async function parseInstruction(instruction) {
-  // call an API TO MY BACKEND HERE BABY. 
-  const completion = await client.chat.completions.create({
-    model: "gpt-4",
-    messages: [
-      {
-        role: "system",
-        content: "You are a helpful assistant that converts natural language instructions into JSON test plans for API testing."
-      },
-      {
-        role: "user",
-        content: `
-          Convert this natural language instruction into a JSON test plan.
-          ${instruction}
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error('Not authenticated. Please run "tstai login" first.');
+  }
 
-          Return ONLY a valid JSON object in this exact format:
-          {
-            "method": "GET|POST|PUT|DELETE",
-            "endpoint": "/path",
-            "payload": { ... },
-            "expected_status": 200
-          }
-
-          Do not include any other text, explanations, or markdown formatting. Just the JSON object.
-        `
-      }
-    ],
-    temperature: 0.1
-  });
-
+  const config = getApiConfig();
+  
   try {
-    const responseText = completion.choices[0].message.content;
+    const response = await fetch(`${config.baseUrl}${config.endpoints.parse}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        instruction: instruction
+      })
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Invalid API key. Please run "tstai login" again.');
+      }
+      if (response.status >= 500) {
+        throw new Error('Server error. Please try again later.');
+      }
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
     
-    // Try to extract JSON from the response if it's wrapped in markdown or other text
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    const jsonString = jsonMatch ? jsonMatch[0] : responseText;
+    // Validate the response structure
+    if (!data.method || !data.endpoint || !data.expected_status) {
+      throw new Error('Invalid response format from API');
+    }
     
-    return JSON.parse(jsonString);
+    return {
+      method: data.method,
+      endpoint: data.endpoint,
+      payload: data.payload || {},
+      expected_status: data.expected_status
+    };
   } catch (error) {
-    console.error("Failed to parse AI output:", error.message);
-    console.error("Raw response:", completion.choices[0].message.content);
-    throw new Error("Failed to parse AI output into JSON");
+    if (error.message.includes('fetch')) {
+      throw new Error('Failed to connect to TSTAI API. Please check your internet connection.');
+    }
+    throw error;
   }
 }
