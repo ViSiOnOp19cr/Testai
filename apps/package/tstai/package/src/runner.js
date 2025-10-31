@@ -13,9 +13,11 @@ export async function runTestsFromFile(filePath, options={}) {
   let failedCount = 0;
   const results = [];
 
+  const apiKey = options.apiKey || null;
+  
   for (const [i, t] of tests.entries()) {
     console.log(`🧠 [${i + 1}] ${t.instruction}`);
-    const plan = await parseInstruction(t.instruction);
+    const plan = await parseInstruction(t.instruction, apiKey);
 
     const url = `${t.baseurl}${plan.endpoint}`;
 

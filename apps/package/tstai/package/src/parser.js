@@ -2,9 +2,16 @@ import OpenAI from "openai";
 import dotenv from "dotenv";
 dotenv.config();  
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+function getOpenAIClient(apiKey = null) {
+  const key = apiKey || process.env.OPENAI_API_KEY;
+  if (!key) {
+    throw new Error("OPENAI_API_KEY is required. Set it via --api-key option, environment variable, or .env file");
+  }
+  return new OpenAI({ apiKey: key });
+}
 
-export async function parseInstruction(instruction) {
+export async function parseInstruction(instruction, apiKey = null) {
+  const client = getOpenAIClient(apiKey);
   const completion = await client.chat.completions.create({
     model: "gpt-4",
     messages: [

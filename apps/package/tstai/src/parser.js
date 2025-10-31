@@ -19,7 +19,6 @@ export async function parseInstruction(instruction) {
         instruction: instruction
       })
     });
-
     if (!response.ok) {
       if (response.status === 401) {
         throw new Error('Invalid API key. Please run "tstai login" again.');
@@ -37,6 +36,7 @@ export async function parseInstruction(instruction) {
     if (!data.method || !data.endpoint || !data.expected_status) {
       throw new Error('Invalid response format from API');
     }
+    
     
     return {
       method: data.method,

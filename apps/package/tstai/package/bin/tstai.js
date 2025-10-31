@@ -11,11 +11,12 @@ program
 program
   .command("run [file]")
   .description("Run test file")
+  .option("--api-key <key>", "OpenAI API key (can also use OPENAI_API_KEY env var or .env file)")
   .option("--logs", "Generate logs for all tests")
   .option("--logs-failed", "Generate logs for failed tests only")
   .action(async (file, options) => {
     const filePath = path.resolve(process.cwd(), file || "tests/example.tests.js");
-    await runTestsFromFile(filePath,options);
+    await runTestsFromFile(filePath, options);
   });
 
 

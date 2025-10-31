@@ -8,10 +8,10 @@ const __dirname = path.dirname(__filename);
 
 // Configuration for the custom API
 const API_CONFIG = {
-  baseUrl: process.env.TSTAI_API_URL || 'https://api.tstai.dev',
+  baseUrl: 'http://localhost:3006',
   endpoints: {
-    parse: '/v1/parse',
-    whoami: '/v1/whoami'
+    parse: '/v1/llm/parse',
+    whoami: '/v1/auth/whoami'
   }
 };
 

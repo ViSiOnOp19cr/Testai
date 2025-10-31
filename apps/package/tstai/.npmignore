@@ -3,3 +3,7 @@ node_modules/
 testlogs/
 *.log
 .DS_Store
+package/
+tests/
+package-lock.json
+bun.lock
