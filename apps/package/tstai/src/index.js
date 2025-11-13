@@ -1,6 +1,6 @@
 const tests = [];
 
-export function name_app(instruction, options = {}) {
+export function tstai(instruction, options = {}) {
   tests.push({ instruction, ...options });
 }
 
