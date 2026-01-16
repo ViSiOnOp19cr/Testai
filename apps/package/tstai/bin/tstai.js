@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { program } from "commander";
 import path from "path";
 import { runTestsFromFile } from "../src/runner.js";
@@ -35,7 +37,7 @@ program
           console.log("   export TSTAI_API_KEY=your-key");
           process.exit(1);
         }
-        
+
         setApiKey(options.apiKey);
         console.log("✅ API key saved to config file!");
         console.log("💡 This method is ideal for local development.");
@@ -60,12 +62,12 @@ program
   .description("Logout and clear stored credentials")
   .action(() => {
     const authStatus = getAuthStatus();
-    
+
     if (!authStatus.authenticated) {
       console.log("❌ Not authenticated. Nothing to logout.");
       return;
     }
-    
+
     if (authStatus.method === 'environment') {
       console.log("⚠️  Using environment variable (TSTAI_API_KEY)");
       console.log("   To logout, unset the environment variable:");
@@ -84,7 +86,7 @@ program
   .action(async () => {
     try {
       const authStatus = getAuthStatus();
-      
+
       if (!authStatus.authenticated) {
         console.log("❌ Not authenticated.");
         console.log("\nAuthentication methods:");
@@ -92,13 +94,13 @@ program
         console.log("2. CLI login: tstai login --api-key your-key");
         process.exit(1);
       }
-      
+
       const userInfo = await whoami();
       console.log("✅ Authenticated successfully!");
       console.log(`🔑 Method: ${authStatus.method === 'environment' ? 'Environment Variable' : 'CLI Config'}`);
       console.log(`👤 User: ${userInfo.email || 'Unknown'}`);
       console.log(`🆔 ID: ${userInfo.id || 'Unknown'}`);
-      
+
       if (authStatus.method === 'environment') {
         console.log("\n💡 Using environment variable (TSTAI_API_KEY)");
         console.log("   This is ideal for CI/CD and automated environments.");

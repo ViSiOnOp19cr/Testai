@@ -6,7 +6,7 @@ const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function parseInstruction(instruction: string) {
   const completion = await client.chat.completions.create({
-    model: "gpt-4",
+    model: "gpt-4.1",
     messages: [
       {
         role: "system",
@@ -35,11 +35,8 @@ export async function parseInstruction(instruction: string) {
 
   try {
     const responseText = completion.choices[0].message.content;
-    
-    // Try to extract JSON from the response if it's wrapped in markdown or other text
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     const jsonString = jsonMatch ? jsonMatch[0] : responseText;
-    
     return JSON.parse(jsonString);
   } catch (error) {
     console.error("Failed to parse AI output:", error.message);
