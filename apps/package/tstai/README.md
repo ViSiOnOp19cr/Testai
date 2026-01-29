@@ -229,11 +229,11 @@ MIT License - see LICENSE file for details
 
 ## 🐛 Issues
 
-Found a bug? Please [open an issue](https://github.com/yourusername/Zest/issues)
+Found a bug? Please [open an issue](https://github.com/yourusername/Tstai/issues)
 
 ## 📮 Support
 
-Need help? Reach out at [your-email@example.com]
+Need help? Reach out at [chandancr515@gmail.com]
 
 ---
 

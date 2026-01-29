@@ -11,7 +11,7 @@ try {
 
   app.use(express.json());
   app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: "*",
     credentials: true,
   }));
   app.use(express.urlencoded({ extended: true }));
@@ -39,21 +39,6 @@ try {
 
   server.on('close', () => {
   });
-
-  // Keep process alive
-  const keepAlive = setInterval(() => {
-    // Just keep the process running - this should not be needed but helps debug
-    if (process.exitCode !== undefined) {
-    }
-  }, 10000); // Check every 10 seconds
-
-  // Clean up on exit
-  process.on('exit', (code) => {
-    clearInterval(keepAlive);
-  });
-
-  // Ensure process doesn't exit unexpectedly
-  process.exitCode = undefined;
 
 } catch (error) {
   process.exit(1);

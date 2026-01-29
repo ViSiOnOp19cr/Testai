@@ -84,7 +84,7 @@ export default function ProjectsPage() {
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
                 <Link href="/home" className="text-2xl font-bold text-[#ff6b35]">
-                  Zest
+                  Tstai
                 </Link>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
