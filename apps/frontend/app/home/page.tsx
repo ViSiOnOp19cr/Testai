@@ -3,23 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getCurrentUser, getApiKeys } from '../services/authService';
+import { getCurrentUser } from '../services/authService';
 import Layout from '../components/Layout';
-import FeatureCard from '../components/FeatureCard';
-import CodeBlock from '../components/CodeBlock';
-
-interface ApiKey {
-  id: string;
-  apiKey: string;
-  prefix: string;
-  createdAt: string;
-}
 
 export default function HomePage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
-  const [apiKeysCount, setApiKeysCount] = useState<number>(0);
-  const [isLoadingKeys, setIsLoadingKeys] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -30,189 +20,81 @@ export default function HomePage() {
     }
   }, [router]);
 
-  useEffect(() => {
-    const fetchApiKeys = async () => {
-      if (user?.email) {
-        setIsLoadingKeys(true);
-        try {
-          const keys = await getApiKeys(user.email);
-          setApiKeysCount(keys.length);
-        } catch (error) {
-          console.error('Failed to fetch API keys:', error);
-        } finally {
-          setIsLoadingKeys(false);
-        }
-      }
-    };
-
-    fetchApiKeys();
-  }, [user]);
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   if (!user) {
-    return null; // Layout component handles loading state
+    return null;
   }
 
-  const installCode = `npm install tstai`;
-  
-  const usageCode = `import { testApi } from 'tstai';
+  const codeExample = `import { tstai } from 'tstai';
 
-testApi({
-  apiKey: 'your-api-key',
-  endpoint: 'https://api.example.com/login',
-  test: 'Check if user login works with valid credentials'
+tstai('GET request to /users should return 200', {
+  baseurl: 'https://api.example.com'
 });`;
 
   return (
     <Layout>
-      <div className="px-4 sm:px-0">
+      <div className="min-h-[calc(100vh-200px)] flex flex-col">
         {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome to <span className="text-[#ff6b35]">Tstai</span>
-          </h1>
-          <p className="text-xl text-gray-600 mb-6">
-            API testing made simple with the power of AI - No coding required
-          </p>
-          <div className="flex justify-center gap-4">
-            <Link
-              href="/projects"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#ff6b35] hover:bg-[#e55a2b] transition-colors shadow-md"
-            >
-              Get Started
-            </Link>
+        <div className="flex-1 flex items-center justify-center px-4 py-16">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              API testing via natural language{' '}
+              <span className="text-[#ff6b35]">AI tests</span>
+            </h1>
+            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+              Write tests in plain English and let AI handle the execution. Built with simplicity and seamless integration.
+            </p>
+          </div>
+        </div>
+
+        {/* Code Example Section */}
+        <div className="px-4 py-12 bg-gray-50">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Write tests in plain English
+            </h2>
+            <div className="relative">
+              <div className="absolute right-3 top-3 z-10">
+                <button
+                  onClick={() => copyToClipboard(codeExample)}
+                  className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition-colors"
+                >
+                  {copied ? '✓ Copied!' : 'Copy'}
+                </button>
+              </div>
+              <pre className="bg-gray-900 text-gray-100 p-6 rounded-lg overflow-x-auto">
+                <code className="text-sm font-mono">{codeExample}</code>
+              </pre>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="px-4 py-16 bg-white">
+          <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                Ready to get started?
+              </h2>
+              <p className="text-gray-600 max-w-md">
+                Start writing natural language tests today and let AI handle the implementation. 
+                Focus on describing your test scenarios while Tstai takes care of the rest.
+              </p>
+            </div>
             <Link
               href="/docs"
-              className="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm"
+              className="inline-flex items-center px-8 py-3 border border-gray-300 text-base font-medium rounded-lg text-gray-900 bg-white hover:bg-gray-50 transition-all shadow-sm hover:shadow-md"
             >
-              View Docs
+              View Documentation
+              <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </Link>
-          </div>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-gradient-to-br from-orange-50 to-white border border-orange-200 rounded-lg p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Account Plan</p>
-                <p className="text-2xl font-bold text-gray-900">{user.plan}</p>
-              </div>
-              <div className="text-4xl">📊</div>
-            </div>
-          </div>
-          <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-200 rounded-lg p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">API Keys</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {isLoadingKeys ? '...' : apiKeysCount}
-                </p>
-              </div>
-              <div className="text-4xl">🔑</div>
-            </div>
-          </div>
-          <div className="bg-gradient-to-br from-green-50 to-white border border-green-200 rounded-lg p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Status</p>
-                <p className="text-2xl font-bold text-green-600">Active</p>
-              </div>
-              <div className="text-4xl">✓</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link
-              href="/projects"
-              className="flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md hover:border-[#ff6b35] transition-all"
-            >
-              <div className="text-3xl mr-4">🔑</div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Create API Key</h3>
-                <p className="text-sm text-gray-600">Generate a new API key</p>
-              </div>
-            </Link>
-            <Link
-              href="/docs"
-              className="flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md hover:border-[#ff6b35] transition-all"
-            >
-              <div className="text-3xl mr-4">📚</div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Read Documentation</h3>
-                <p className="text-sm text-gray-600">Learn how to use Tstai</p>
-              </div>
-            </Link>
-            <Link
-              href="/projects"
-              className="flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md hover:border-[#ff6b35] transition-all"
-            >
-              <div className="text-3xl mr-4">⚡</div>
-              <div>
-                <h3 className="font-semibold text-gray-900">View Projects</h3>
-                <p className="text-sm text-gray-600">Manage your API keys</p>
-              </div>
-            </Link>
-          </div>
-        </div>
-
-        {/* Installation & Usage */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Getting Started</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Install Tstai</h3>
-              <CodeBlock code={installCode} language="bash" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Quick Example</h3>
-              <CodeBlock code={usageCode} language="javascript" />
-            </div>
-          </div>
-        </div>
-
-        {/* Feature Highlights */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Why Choose Tstai?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <FeatureCard
-              icon="🤖"
-              title="AI-Powered"
-              description="Write tests in natural language. Let AI handle the complexity."
-            />
-            <FeatureCard
-              icon="⚡"
-              title="Fast & Simple"
-              description="No complex configuration. Get started in minutes, not hours."
-            />
-            <FeatureCard
-              icon="🔒"
-              title="Secure"
-              description="Enterprise-grade security with built-in API key management."
-            />
-            <FeatureCard
-              icon="📊"
-              title="Analytics"
-              description="Track API performance and monitor test results in real-time."
-            />
-          </div>
-        </div>
-
-        {/* Account Details */}
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Account</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-600">Email</p>
-              <p className="text-base font-medium text-gray-900">{user.email}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Name</p>
-              <p className="text-base font-medium text-gray-900">{user.name}</p>
-            </div>
           </div>
         </div>
       </div>
