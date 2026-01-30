@@ -3,11 +3,23 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getCurrentUser, logout } from '../services/authService';
+import { getCurrentUser, getApiKeys } from '../services/authService';
+import Layout from '../components/Layout';
+import FeatureCard from '../components/FeatureCard';
+import CodeBlock from '../components/CodeBlock';
+
+interface ApiKey {
+  id: string;
+  apiKey: string;
+  prefix: string;
+  createdAt: string;
+}
 
 export default function HomePage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const [apiKeysCount, setApiKeysCount] = useState<number>(0);
+  const [isLoadingKeys, setIsLoadingKeys] = useState(true);
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -18,84 +30,192 @@ export default function HomePage() {
     }
   }, [router]);
 
-  const handleLogout = () => {
-    logout();
-    router.push('/login');
-  };
+  useEffect(() => {
+    const fetchApiKeys = async () => {
+      if (user?.email) {
+        setIsLoadingKeys(true);
+        try {
+          const keys = await getApiKeys(user.email);
+          setApiKeysCount(keys.length);
+        } catch (error) {
+          console.error('Failed to fetch API keys:', error);
+        } finally {
+          setIsLoadingKeys(false);
+        }
+      }
+    };
+
+    fetchApiKeys();
+  }, [user]);
 
   if (!user) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
-      </div>
-    );
+    return null; // Layout component handles loading state
   }
 
-  return (
-    <div className="min-h-screen bg-white">
-      <nav className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <h1 className="text-2xl font-bold text-[#ff6b35]">Tstai</h1>
-              </div>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <Link
-                  href="/home"
-                  className="border-[#ff6b35] text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/docs"
-                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                >
-                  Docs
-                </Link>
-                <Link
-                  href="/projects"
-                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                >
-                  Projects
-                </Link>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-sm text-gray-700 mr-4">Welcome, {user.name}</span>
-                <button
-                  onClick={handleLogout}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#ff6b35] hover:bg-[#e55a2b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ff6b35]"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
+  const installCode = `npm install tstai`;
+  
+  const usageCode = `import { testApi } from 'tstai';
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Welcome to Tstai</h2>
-              <p className="text-lg text-gray-600 mb-6">
-                API testing made simple with natural language
-              </p>
-              <div className="space-y-4">
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Your Account</h3>
-                  <p className="text-sm text-gray-600">Email: {user.email}</p>
-                  <p className="text-sm text-gray-600">Plan: {user.plan}</p>
-                </div>
+testApi({
+  apiKey: 'your-api-key',
+  endpoint: 'https://api.example.com/login',
+  test: 'Check if user login works with valid credentials'
+});`;
+
+  return (
+    <Layout>
+      <div className="px-4 sm:px-0">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Welcome to <span className="text-[#ff6b35]">Tstai</span>
+          </h1>
+          <p className="text-xl text-gray-600 mb-6">
+            API testing made simple with the power of AI - No coding required
+          </p>
+          <div className="flex justify-center gap-4">
+            <Link
+              href="/projects"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#ff6b35] hover:bg-[#e55a2b] transition-colors shadow-md"
+            >
+              Get Started
+            </Link>
+            <Link
+              href="/docs"
+              className="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm"
+            >
+              View Docs
+            </Link>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div className="bg-gradient-to-br from-orange-50 to-white border border-orange-200 rounded-lg p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Account Plan</p>
+                <p className="text-2xl font-bold text-gray-900">{user.plan}</p>
               </div>
+              <div className="text-4xl">📊</div>
+            </div>
+          </div>
+          <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-200 rounded-lg p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">API Keys</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {isLoadingKeys ? '...' : apiKeysCount}
+                </p>
+              </div>
+              <div className="text-4xl">🔑</div>
+            </div>
+          </div>
+          <div className="bg-gradient-to-br from-green-50 to-white border border-green-200 rounded-lg p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Status</p>
+                <p className="text-2xl font-bold text-green-600">Active</p>
+              </div>
+              <div className="text-4xl">✓</div>
             </div>
           </div>
         </div>
-      </main>
-    </div>
+
+        {/* Quick Actions */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link
+              href="/projects"
+              className="flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md hover:border-[#ff6b35] transition-all"
+            >
+              <div className="text-3xl mr-4">🔑</div>
+              <div>
+                <h3 className="font-semibold text-gray-900">Create API Key</h3>
+                <p className="text-sm text-gray-600">Generate a new API key</p>
+              </div>
+            </Link>
+            <Link
+              href="/docs"
+              className="flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md hover:border-[#ff6b35] transition-all"
+            >
+              <div className="text-3xl mr-4">📚</div>
+              <div>
+                <h3 className="font-semibold text-gray-900">Read Documentation</h3>
+                <p className="text-sm text-gray-600">Learn how to use Tstai</p>
+              </div>
+            </Link>
+            <Link
+              href="/projects"
+              className="flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md hover:border-[#ff6b35] transition-all"
+            >
+              <div className="text-3xl mr-4">⚡</div>
+              <div>
+                <h3 className="font-semibold text-gray-900">View Projects</h3>
+                <p className="text-sm text-gray-600">Manage your API keys</p>
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* Installation & Usage */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Getting Started</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Install Tstai</h3>
+              <CodeBlock code={installCode} language="bash" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Quick Example</h3>
+              <CodeBlock code={usageCode} language="javascript" />
+            </div>
+          </div>
+        </div>
+
+        {/* Feature Highlights */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Why Choose Tstai?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <FeatureCard
+              icon="🤖"
+              title="AI-Powered"
+              description="Write tests in natural language. Let AI handle the complexity."
+            />
+            <FeatureCard
+              icon="⚡"
+              title="Fast & Simple"
+              description="No complex configuration. Get started in minutes, not hours."
+            />
+            <FeatureCard
+              icon="🔒"
+              title="Secure"
+              description="Enterprise-grade security with built-in API key management."
+            />
+            <FeatureCard
+              icon="📊"
+              title="Analytics"
+              description="Track API performance and monitor test results in real-time."
+            />
+          </div>
+        </div>
+
+        {/* Account Details */}
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Account</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Email</p>
+              <p className="text-base font-medium text-gray-900">{user.email}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Name</p>
+              <p className="text-base font-medium text-gray-900">{user.name}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Layout>
   );
 }
-
