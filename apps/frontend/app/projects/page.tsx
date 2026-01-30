@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getCurrentUser, logout, createApi } from '../services/authService';
+import { getCurrentUser, logout, createApi, getApiKeys } from '../services/authService';
 
 interface ApiKey {
   id: string;
@@ -19,6 +19,7 @@ export default function ProjectsPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isLoadingKeys, setIsLoadingKeys] = useState(true);
   const [createdApiKey, setCreatedApiKey] = useState<ApiKey | null>(null);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
 
@@ -30,6 +31,24 @@ export default function ProjectsPage() {
       setUser(currentUser);
     }
   }, [router]);
+
+  useEffect(() => {
+    const fetchApiKeys = async () => {
+      if (user?.email) {
+        setIsLoadingKeys(true);
+        try {
+          const keys = await getApiKeys(user.email);
+          setApiKeys(keys);
+        } catch (error) {
+          console.error('Failed to fetch API keys:', error);
+        } finally {
+          setIsLoadingKeys(false);
+        }
+      }
+    };
+
+    fetchApiKeys();
+  }, [user]);
 
   const handleLogout = () => {
     logout();
@@ -182,7 +201,23 @@ export default function ProjectsPage() {
             </div>
           )}
 
-          {apiKeys.length === 0 && !createdApiKey && (
+          {isLoadingKeys && (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white border border-gray-200 rounded-lg p-4 animate-pulse">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+                    </div>
+                    <div className="h-8 w-20 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!isLoadingKeys && apiKeys.length === 0 && !createdApiKey && (
             <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center">
               <div className="text-center">
                 <p className="text-lg text-gray-600 mb-4">

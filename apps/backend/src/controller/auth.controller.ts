@@ -112,6 +112,40 @@ export async function createApi(req: Request, res: Response) {
   }
 }
 
+export async function getApiKeys(req: Request, res: Response) {
+  try {
+    const { email } = req.query;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const userResult = await pool.query('SELECT id FROM "User" WHERE email = $1', [email]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = userResult.rows[0];
+
+    const apiKeysResult = await pool.query(
+      'SELECT id, keyprefix as prefix, last_used as "createdAt" FROM "API_Keys" WHERE userid = $1 AND is_active = true ORDER BY last_used DESC',
+      [user.id]
+    );
+
+    const apiKeys = apiKeysResult.rows.map(row => ({
+      id: row.id,
+      prefix: row.prefix,
+      createdAt: row.createdAt,
+      apiKey: '••••••••••••••••••••••••••••••••' // Hidden for security
+    }));
+
+    res.json(apiKeys);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch API keys' });
+  }
+}
+
 export async function whoami(req: Request, res: Response) {
   try {
     const user = (req as any).user;

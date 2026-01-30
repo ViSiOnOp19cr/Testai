@@ -10,12 +10,12 @@ export async function register(email: string, password: string, name: string) {
             name
         })
     });
-    
+
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Registration failed');
     }
-    
+
     return response.json();
 }
 
@@ -28,19 +28,19 @@ export async function login(email: string, password: string) {
             password
         })
     });
-    
+
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Login failed');
     }
-    
+
     const data = await response.json();
-    
+
     // Store user data in localStorage
     if (typeof window !== 'undefined') {
         localStorage.setItem('user', JSON.stringify(data));
     }
-    
+
     return data;
 }
 
@@ -71,11 +71,25 @@ export async function createApi(email: string, password: string) {
             password
         })
     });
-    
+
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Failed to create API key');
     }
-    
+
+    return response.json();
+}
+
+export async function getApiKeys(email: string) {
+    const response = await fetch(`${API_BASE_URL}/auth/apikeys?email=${encodeURIComponent(email)}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to fetch API keys');
+    }
+
     return response.json();
 }
