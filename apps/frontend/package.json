@@ -4,12 +4,17 @@
   "private": true,
   "engines": {
     "node": "20.x"
-  },  
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop testai-frontend",
+    "pm2:restart": "pm2 restart testai-frontend",
+    "pm2:logs": "pm2 logs testai-frontend",
+    "pm2:monit": "pm2 monit"
   },
   "dependencies": {
     "react": "19.2.0",

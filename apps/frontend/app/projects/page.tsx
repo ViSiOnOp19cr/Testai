@@ -33,22 +33,33 @@ export default function ProjectsPage() {
   }, [router]);
 
   useEffect(() => {
+    const abortController = new AbortController();
+    
     const fetchApiKeys = async () => {
       if (user?.email) {
         setIsLoadingKeys(true);
         try {
-          const keys = await getApiKeys(user.email);
-          setApiKeys(keys);
-        } catch (error) {
-          console.error('Failed to fetch API keys:', error);
+          const keys = await getApiKeys(user.email, abortController.signal);
+          if (!abortController.signal.aborted) {
+            setApiKeys(keys);
+          }
+        } catch (error: any) {
+          if (!abortController.signal.aborted) {
+            console.error('Failed to fetch API keys:', error);
+          }
         } finally {
-          setIsLoadingKeys(false);
+          if (!abortController.signal.aborted) {
+            setIsLoadingKeys(false);
+          }
         }
       }
     };
 
     fetchApiKeys();
-  }, [user]);
+    return () => {
+      abortController.abort();
+    };
+  }, [user?.email]);
 
   const handleCreateApi = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +94,7 @@ export default function ProjectsPage() {
   };
 
   if (!user) {
-    return null; // Layout handles loading state
+    return null; 
   }
 
   return (
