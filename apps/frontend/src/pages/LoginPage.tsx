@@ -1,67 +1,103 @@
-'use client';
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { login } from '../services/authService'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { login } from '../services/authService';
+/**
+ * LoginPage Component
+ * 
+ * This page allows existing users to log in with their email and password.
+ * Features:
+ * 1. Email and password input fields
+ * 2. Form validation
+ * 3. Error display for failed login attempts
+ * 4. Loading state during authentication
+ * 5. Link to registration page for new users
+ * 
+ * After successful login, redirects to the home page.
+ */
 
 export default function LoginPage() {
-  const router = useRouter();
+  const navigate = useNavigate()
+  
+  // Form data state
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+    password: '',
+  })
+  
+  // Error message state
+  const [error, setError] = useState('')
+  
+  // Loading state to disable form during submission
+  const [loading, setLoading] = useState(false)
 
+  /**
+   * Handle input changes
+   * Updates form data and clears any existing errors
+   */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
-    });
-    setError('');
-  };
+      [e.target.name]: e.target.value,
+    })
+    setError('') // Clear error when user starts typing
+  }
 
+  /**
+   * Handle form submission
+   * Validates input and attempts to log in
+   */
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+    e.preventDefault() // Prevent page reload
+    setError('')
 
+    // Basic validation
     if (!formData.email || !formData.password) {
-      setError('Email and password are required');
-      return;
+      setError('Email and password are required')
+      return
     }
 
-    setLoading(true);
+    setLoading(true)
     try {
-      await login(formData.email, formData.password);
-      router.push('/home');
+      // Call the login service
+      await login(formData.email, formData.password)
+      
+      // Success! Redirect to home page
+      navigate('/home')
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      // Show error message
+      setError(err.message || 'Login failed. Please check your credentials.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
+        {/* Header */}
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
-            <Link href="/register" className="font-medium text-[#ff6b35] hover:text-[#e55a2b]">
+            <Link to="/register" className="font-medium text-[#ff6b35] hover:text-[#e55a2b]">
               create a new account
             </Link>
           </p>
         </div>
+        
+        {/* Login Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {/* Error Message */}
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
               {error}
             </div>
           )}
+          
+          {/* Input Fields */}
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="email" className="sr-only">
@@ -97,6 +133,7 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {/* Submit Button */}
           <div>
             <button
               type="submit"
@@ -109,6 +146,5 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
-  );
+  )
 }
-

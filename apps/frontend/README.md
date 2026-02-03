@@ -1,36 +1,200 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tstai Frontend - React.js Application
+
+This is the frontend for the Tstai API testing platform, built with **React.js** and **Vite**.
+
+## Technology Stack
+
+- **React 18** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool and dev server
+- **React Router v6** - Client-side routing
+- **Tailwind CSS** - Styling
+- **Google Fonts** (Inter & JetBrains Mono) - Typography
+
+## Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── CodeBlock.tsx   # Code display with copy functionality
+│   ├── FeatureCard.tsx # Feature display card
+│   ├── Layout.tsx      # Main layout wrapper with auth
+│   └── Navbar.tsx      # Navigation bar
+├── pages/              # Page components (routes)
+│   ├── DocsPage.tsx    # Documentation page
+│   ├── HomePage.tsx    # Main dashboard
+│   ├── LoginPage.tsx   # Login page
+│   ├── ProjectsPage.tsx # API key management
+│   ├── RegisterPage.tsx # Registration page
+│   └── RootPage.tsx    # Root redirect page
+├── services/           # API and business logic
+│   └── authService.ts  # Authentication service
+├── styles/             # Global styles
+│   └── globals.css     # Tailwind + custom CSS
+├── App.tsx            # Root component with routes
+├── main.tsx           # Application entry point
+└── vite-env.d.ts      # TypeScript env declarations
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ (currently using Node 25)
+- npm or pnpm
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.local.example .env.local
+
+# Edit .env.local and set your API URL
+# VITE_API_URL=http://localhost:3006/v1
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Start development server (runs on http://localhost:3000)
+npm run dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# The dev server includes hot module replacement (HMR)
+# Changes will be reflected immediately without page reload
+```
+
+### Build for Production
+
+```bash
+# Type check and build
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+### Linting
+
+```bash
+# Run ESLint
+npm run lint
+```
+
+## Environment Variables
+
+Create a `.env.local` file (ignored by git) with:
+
+```bash
+VITE_API_URL=http://localhost:3006/v1
+```
+
+For production, set `VITE_API_URL` to your production API URL.
+
+**Note:** Vite only exposes environment variables prefixed with `VITE_` to the client code.
+
+## Routing
+
+The application uses React Router v6 for client-side routing:
+
+- `/` - Root page (redirects to login or home)
+- `/login` - Login page
+- `/register` - Registration page
+- `/home` - Main dashboard (protected)
+- `/projects` - API key management (protected)
+- `/docs` - Documentation (protected)
+
+Protected routes require authentication and will redirect to `/login` if not authenticated.
+
+## Authentication
+
+Authentication is handled via:
+1. Login/Register forms that call the backend API
+2. JWT tokens stored in `localStorage`
+3. `Layout` component checks auth status on protected pages
+4. `authService.ts` manages all auth operations
+
+## Code Style
+
+- **Beginner-friendly**: Code includes comprehensive comments explaining concepts
+- **Modular**: Reusable components and services
+- **TypeScript**: Type safety throughout
+- **Clean imports**: Using path aliases (`@components`, `@pages`, etc.)
+
+## Key Differences from Next.js
+
+This app was converted from Next.js to React.js:
+
+| Feature | Next.js | React.js + Vite |
+|---------|---------|-----------------|
+| Routing | File-based (App Router) | React Router v6 |
+| Navigation | `useRouter()` from `next/navigation` | `useNavigate()` from `react-router-dom` |
+| Links | `<Link>` from `next/link` | `<Link>` from `react-router-dom` |
+| Env Vars | `process.env.NEXT_PUBLIC_*` | `import.meta.env.VITE_*` |
+| Client Directive | `'use client'` required | Not needed (all client-side) |
+| Rendering | SSR/SSG by default | Client-side only (SPA) |
+
+## Development Tips
+
+1. **Hot Reload**: Vite's HMR is fast - changes appear instantly
+2. **Path Aliases**: Use `@components/*`, `@pages/*`, etc. for cleaner imports
+3. **Type Checking**: Run `npm run build` to catch TypeScript errors
+4. **Browser DevTools**: React DevTools extension is helpful for debugging
+5. **Console Logs**: Check browser console for any runtime errors
+
+## Deployment
+
+1. Build the production bundle: `npm run build`
+2. The `dist/` folder contains the static files
+3. Deploy to any static hosting (Vercel, Netlify, Cloudflare Pages, etc.)
+4. Make sure to set the `VITE_API_URL` environment variable in your hosting platform
+
+### Example: Vercel Deployment
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+
+# Set environment variable in Vercel dashboard:
+# VITE_API_URL = https://your-api.com/v1
+```
+
+## Troubleshooting
+
+### Build Errors
+
+If you see TypeScript errors during build:
+```bash
+# Check types without building
+npx tsc --noEmit
+```
+
+### Development Server Won't Start
+
+```bash
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json dist
+npm install
+```
+
+### Environment Variables Not Working
+
+- Make sure variable names start with `VITE_`
+- Restart dev server after changing .env files
+- Check `import.meta.env.VITE_API_URL` is used in code
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+- [React Documentation](https://react.dev/)
+- [Vite Documentation](https://vitejs.dev/)
+- [React Router Documentation](https://reactrouter.com/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Support
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For questions about the Tstai platform, visit the documentation page or contact support.

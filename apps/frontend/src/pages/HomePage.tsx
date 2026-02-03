@@ -1,45 +1,61 @@
-'use client';
+import { useEffect, useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { getCurrentUser } from '../services/authService'
+import Layout from '../components/Layout'
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { getCurrentUser } from '../services/authService';
-import Layout from '../components/Layout';
+/**
+ * HomePage Component
+ * 
+ * This is the main dashboard page shown after login.
+ * Features:
+ * 1. Hero section with product tagline
+ * 2. Code example with copy functionality
+ * 3. Call-to-action section linking to documentation
+ * 
+ * The page is wrapped in Layout component for authentication and navigation.
+ */
 
 export default function HomePage() {
-  const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [copied, setCopied] = useState(false);
+  const navigate = useNavigate()
+  const [user, setUser] = useState<any>(null)
+  const [copied, setCopied] = useState(false)
 
+  // Check authentication on component mount
   useEffect(() => {
-    const currentUser = getCurrentUser();
+    const currentUser = getCurrentUser()
     if (!currentUser) {
-      router.push('/login');
+      navigate('/login')
     } else {
-      setUser(currentUser);
+      setUser(currentUser)
     }
-  }, [router]);
+  }, [navigate])
 
+  /**
+   * Copy code to clipboard
+   * Shows success feedback for 2 seconds
+   */
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  if (!user) {
-    return null;
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
+  // Don't render anything until user is loaded
+  if (!user) {
+    return null
+  }
+
+  // Example code to display
   const codeExample = `import { tstai } from 'tstai';
 
 tstai('GET request to /users should return 200', {
   baseurl: 'https://api.example.com'
-});`;
+});`
 
   return (
     <Layout>
       <div className="min-h-[calc(100vh-200px)] flex flex-col">
-        {/* Hero Section */}
+        {/* Hero Section - Main heading and tagline */}
         <div className="flex-1 flex items-center justify-center px-4 py-16">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
@@ -58,6 +74,8 @@ tstai('GET request to /users should return 200', {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               Write tests in plain English
             </h2>
+            
+            {/* Code block with copy button */}
             <div className="relative">
               <div className="absolute right-3 top-3 z-10">
                 <button
@@ -74,7 +92,7 @@ tstai('GET request to /users should return 200', {
           </div>
         </div>
 
-        {/* CTA Section */}
+        {/* Call-to-Action Section */}
         <div className="px-4 py-16 bg-white">
           <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
@@ -86,8 +104,10 @@ tstai('GET request to /users should return 200', {
                 Focus on describing your test scenarios while Tstai takes care of the rest.
               </p>
             </div>
+            
+            {/* Link to documentation */}
             <Link
-              href="/docs"
+              to="/docs"
               className="inline-flex items-center px-8 py-3 border border-gray-300 text-base font-medium rounded-lg text-gray-900 bg-white hover:bg-gray-50 transition-all shadow-sm hover:shadow-md"
             >
               View Documentation
@@ -99,5 +119,5 @@ tstai('GET request to /users should return 200', {
         </div>
       </div>
     </Layout>
-  );
+  )
 }
