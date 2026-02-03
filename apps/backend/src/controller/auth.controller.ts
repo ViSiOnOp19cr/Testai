@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import pool from '../config/database';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 
 export async function register(req: Request, res: Response) {
   try {
@@ -58,11 +59,15 @@ export async function login(req: Request, res: Response) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    const token = jwt.sign({
+      id:user.id,
+    }, process.env.JWT_SECRET,{
+      expiresIn:'1h'
+    });
+
     res.json({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      plan: user.plan,
+      message:"logged in successfully",
+      token
     });
   } catch (error) {
     res.status(500).json({ error: 'Login failed' });

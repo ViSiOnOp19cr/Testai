@@ -60,8 +60,11 @@ export default function LoginPage() {
     setLoading(true)
     try {
       // Call the login service
-      await login(formData.email, formData.password)
-      
+      const response = await login(formData.email, formData.password)
+
+      if(response.token){
+        localStorage.setItem('token', response.token)
+      }
       // Success! Redirect to home page
       navigate('/home')
     } catch (err: any) {

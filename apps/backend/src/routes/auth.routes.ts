@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { register, login, createApi, whoami, getApiKeys } from '../controller/auth.controller';
-import { authenticateApiKey } from '../middlewares/auth.middleware';
+import { authenticateApiKey } from '../middlewares/llm.middleware';
 
 const router = Router();
 
