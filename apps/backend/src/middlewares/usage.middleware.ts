@@ -60,7 +60,6 @@ export const checkQuota = async (
       `INSERT INTO "API_Usage" (id, user_id, endpoint) VALUES ($1, $2, $3)`,
       [uuidv4(), userId, req.path]
     );
-
     res.setHeader('X-Quota-Limit', user.monthly_quota);
     res.setHeader('X-Quota-Used', currentUsage + 1);
     res.setHeader('X-Quota-Remaining', user.monthly_quota - currentUsage - 1);

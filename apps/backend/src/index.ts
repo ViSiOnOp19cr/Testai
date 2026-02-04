@@ -14,8 +14,6 @@ try {
     origin: "*",
   }));
   app.use(express.urlencoded({ extended: true }));
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
   app.use(routes);
 
   app.get('/health', (req, res) => {
@@ -35,10 +33,6 @@ try {
     console.error('[ERROR] Server error:', error);
     console.error('[ERROR] Stack:', error.stack);
   });
-
-  server.on('close', () => {
-  });
-
 } catch (error) {
   process.exit(1);
 }
