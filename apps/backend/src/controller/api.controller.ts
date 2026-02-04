@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import pool from '../config/database';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
+
+
 export async function createApi(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
@@ -70,7 +72,7 @@ export async function getApiKeys(req: Request, res: Response) {
       id: row.id,
       prefix: row.prefix,
       createdAt: row.createdAt,
-      apiKey: '••••••••••••••••••••••••••••••••' // Hidden for security
+      apiKey: '••••••••••••••••••••••••••••••••' 
     }));
 
     res.json(apiKeys);

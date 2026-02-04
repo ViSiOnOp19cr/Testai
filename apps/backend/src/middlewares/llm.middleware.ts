@@ -45,7 +45,7 @@ export async function authenticateApiKey(req: Request, res: Response, next: Next
     (req as any).apiKey = {
       id: apiKeyRecord.id,
       userid: apiKeyRecord.userid,
-      keyhash: apiKeyRecord.keyhash,
+      //keyhash: apiKeyRecord.keyhash,
       keyprefix: apiKeyRecord.keyprefix,
       is_active: apiKeyRecord.is_active,
       last_used: apiKeyRecord.last_used,

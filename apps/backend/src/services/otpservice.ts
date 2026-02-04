@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import client from './redisclinet';
 
-export const generateOtp = async (email: string) => {
+export const generateOtp=()=>{
     return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
@@ -49,5 +49,15 @@ export const verifyOtp = async (email: string, otp: string, purpose: string) => 
             message: "otp verification failed"
         }
     }
+}
+export const checkRateLimit = async(email:string)=>{
+    const key = `ratelimit:${email}`;
+    const count = parseInt(await client.get(key) || '0');
+    if(count >=5){
+        return false;
+    }
+    await client.incr(key);
+    await client.expire(key,60*15);
+    return true;
 }
 
