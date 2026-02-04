@@ -1,11 +1,11 @@
 import Redis from 'ioredis';
 
 const client = new Redis({
-    host:process.env.REDIS_HOST,
-    port:Number(process.env.REDIS_PORT),
-    password:process.env.REDIS_PASSWORD,
-    tls:{},
-    connectTimeout:10000,
+  host: process.env.REDIS_HOST,
+  port: Number(process.env.REDIS_PORT),
+  password: process.env.REDIS_PASSWORD,
+  tls: {},
+  connectTimeout: 10000,
 });
 
 client.on('error',(err)=>{

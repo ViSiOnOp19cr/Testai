@@ -19,8 +19,7 @@ try {
   app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
   });
-
-  // Error handling middleware
+  
   app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
     res.status(500).json({ error: 'Internal server error' });
   });
