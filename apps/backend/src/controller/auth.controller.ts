@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
 import pool from '../config/database';
 import bcrypt from 'bcrypt';
-import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 
-export async function register(req: Request, res: Response) {
+interface AuthRequest extends Request{
+  userid?:string;
+}
+export const register = async(req: Request, res: Response) => {
   try {
     const { email, password, name } = req.body;
 
@@ -38,7 +40,7 @@ export async function register(req: Request, res: Response) {
   }
 }
 
-export async function login(req: Request, res: Response) {
+export const login = async(req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
@@ -73,84 +75,6 @@ export async function login(req: Request, res: Response) {
     res.status(500).json({ error: 'Login failed' });
   }
 }
-
-export async function createApi(req: Request, res: Response) {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
-
-    const userResult = await pool.query('SELECT * FROM "User" WHERE email = $1', [email]);
-
-    if (userResult.rows.length === 0) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    const user = userResult.rows[0];
-
-    const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    const apiKey = `tst_${crypto.randomBytes(32).toString('hex')}`;
-    const keyPrefix = apiKey.substring(0, 8);
-    const keyHash = await bcrypt.hash(apiKey, 10);
-
-    const apiKeyResult = await pool.query(
-      'INSERT INTO "API_Keys" (id, userid, keyhash, keyprefix, is_active, last_used) VALUES (gen_random_uuid()::text, $1, $2, $3, $4, NOW()) RETURNING id',
-      [user.id, keyHash, keyPrefix, true]
-    );
-
-    const apiKeyRecord = apiKeyResult.rows[0];
-
-    res.status(201).json({
-      id: apiKeyRecord.id,
-      apiKey: apiKey,
-      prefix: keyPrefix,
-      createdAt: apiKeyRecord.id,
-    });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create API key' });
-  }
-}
-
-export async function getApiKeys(req: Request, res: Response) {
-  try {
-    const { email } = req.query;
-
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required' });
-    }
-
-    const userResult = await pool.query('SELECT id FROM "User" WHERE email = $1', [email]);
-
-    if (userResult.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const user = userResult.rows[0];
-
-    const apiKeysResult = await pool.query(
-      'SELECT id, keyprefix as prefix, last_used as "createdAt" FROM "API_Keys" WHERE userid = $1 AND is_active = true ORDER BY last_used DESC',
-      [user.id]
-    );
-
-    const apiKeys = apiKeysResult.rows.map(row => ({
-      id: row.id,
-      prefix: row.prefix,
-      createdAt: row.createdAt,
-      apiKey: '••••••••••••••••••••••••••••••••' // Hidden for security
-    }));
-
-    res.json(apiKeys);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch API keys' });
-  }
-}
-
 export async function whoami(req: Request, res: Response) {
   try {
     const user = (req as any).user;
@@ -167,5 +91,28 @@ export async function whoami(req: Request, res: Response) {
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to get user info' });
+  }
+}
+export const updatePassword = async(req:AuthRequest, res:Response)=>{
+  try{
+    const {newPassword} = req.body;
+    const user = req.userid;
+    if(!newPassword){
+      return res.status(400).json({
+        message:"password field is requires"
+      });
+    }
+    const hashedPassword = await bcrypt.hash(newPassword,10);
+    await pool.query(
+      'UPDATE User SET password = $1 WHERE id = $2',[hashedPassword,user]
+    );
+    return res.status(200).json({
+      message:'password changed successfully'
+    });
+  }catch(error){
+    console.log("error in updatePassword",error);
+    return res.status(500).json({
+      message:'password update failed'
+    });
   }
 }

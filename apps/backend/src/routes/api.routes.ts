@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import {createApi,getApiKeys} from '../controller/auth.controller';
+import {createApi,getApiKeys} from '../controller/api.controller';
 import {auth_middleware} from '../middlewares/auth.middleware';
 
 
