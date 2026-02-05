@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 // Configuration for the custom API
 const API_CONFIG = {
-  baseUrl: 'http://localhost:3006',
+  baseUrl: 'https://tstai-backend--s7q4sfe.salmonisland-38339984.southindia.azurecontainerapps.io',
   endpoints: {
     parse: '/v1/llm/parse',
     whoami: '/v1/auth/whoami'
@@ -64,7 +64,7 @@ export function getApiKey() {
   if (process.env.TSTAI_API_KEY) {
     return process.env.TSTAI_API_KEY;
   }
-  
+
   // Second priority: Stored config (CLI friendly)
   const config = loadConfig();
   return config.apiKey || null;
@@ -77,12 +77,12 @@ export function getAuthMethod() {
   if (process.env.TSTAI_API_KEY) {
     return 'environment';
   }
-  
+
   const config = loadConfig();
   if (config.apiKey) {
     return 'config';
   }
-  
+
   return 'none';
 }
 
@@ -117,7 +117,7 @@ export function isAuthenticated() {
 export function getAuthStatus() {
   const apiKey = getApiKey();
   const method = getAuthMethod();
-  
+
   return {
     authenticated: !!apiKey,
     method: method,
