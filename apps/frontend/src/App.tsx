@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import RootPage from './pages/RootPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import HomePage from './pages/HomePage'
 import ProjectsPage from './pages/ProjectsPage'
 import DocsPage from './pages/DocsPage'
@@ -16,6 +17,7 @@ import DocsPage from './pages/DocsPage'
  * - / : Root page (redirects to /login or /home based on auth status)
  * - /login : Login page for user authentication
  * - /register : Registration page for new users
+ * - /forgot-password : Password reset page with OTP verification
  * - /home : Main dashboard (protected, requires authentication)
  * - /projects : API key management page (protected)
  * - /docs : Documentation page (protected)
@@ -30,6 +32,7 @@ function App() {
       {/* Public routes - accessible without authentication */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       
       {/* Protected routes - require authentication (handled by Layout component) */}
       <Route path="/home" element={<HomePage />} />

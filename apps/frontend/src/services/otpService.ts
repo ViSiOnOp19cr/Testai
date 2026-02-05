@@ -49,10 +49,10 @@ async function fetchWithTimeout(
  * Send OTP to email
  * 
  * @param email - User's email address
- * @param purpose - Purpose of OTP ('signup' or 'reset-password')
+ * @param purpose - Purpose of OTP ('signup' or 'reset-password') - REQUIRED
  * @returns Promise with success message
  */
-export async function sendOtp(email: string, purpose: 'signup' | 'reset-password' = 'signup') {
+export async function sendOtp(email: string, purpose: 'signup' | 'reset-password') {
     const response = await fetchWithTimeout(`${API_BASE_URL}/otp/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -75,10 +75,10 @@ export async function sendOtp(email: string, purpose: 'signup' | 'reset-password
  * 
  * @param email - User's email address
  * @param otp - OTP code to verify
- * @param purpose - Purpose of OTP ('signup' or 'reset-password')
+ * @param purpose - Purpose of OTP ('signup' or 'reset-password') - REQUIRED
  * @returns Promise with verification result
  */
-export async function verifyOtp(email: string, otp: string, purpose: 'signup' | 'reset-password' = 'signup') {
+export async function verifyOtp(email: string, otp: string, purpose: 'signup' | 'reset-password') {
     const response = await fetchWithTimeout(`${API_BASE_URL}/otp/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

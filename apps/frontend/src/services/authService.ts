@@ -103,9 +103,6 @@ export async function login(email: string, password: string) {
 
     const data = await response.json()
 
-    // Store user data in localStorage for persistence across page refreshes
-    localStorage.setItem('user', JSON.stringify(data))
-
     return data
 }
 
@@ -115,6 +112,7 @@ export async function login(email: string, password: string) {
  */
 export function logout() {
     localStorage.removeItem('user')
+    localStorage.removeItem('token')
 }
 
 /**
@@ -144,9 +142,14 @@ export function isAuthenticated(): boolean {
  * @returns Promise with the newly created API key data
  */
 export async function createApi(email: string, password: string) {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/auth/createapi`, {
+    const token = localStorage.getItem('token')
+
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/createapi`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
             email,
             password,
@@ -169,11 +172,16 @@ export async function createApi(email: string, password: string) {
  * @returns Promise with array of API keys
  */
 export async function getApiKeys(email: string, signal?: AbortSignal) {
+    const token = localStorage.getItem('token')
+
     const response = await fetchWithTimeout(
-        `${API_BASE_URL}/auth/apikeys?email=${encodeURIComponent(email)}`,
+        `${API_BASE_URL}/api/apikeys?email=${encodeURIComponent(email)}`,
         {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             signal,
         }
     )
@@ -181,6 +189,33 @@ export async function getApiKeys(email: string, signal?: AbortSignal) {
     if (!response.ok) {
         const error = await response.json()
         throw new Error(error.error || 'Failed to fetch API keys')
+    }
+
+    return response.json()
+}
+
+/**
+ * Reset password using OTP verification (for forgot password flow)
+ * 
+ * @param email - User's email address
+ * @param otp - Verified OTP code
+ * @param newPassword - New password to set
+ * @returns Promise with success message
+ */
+export async function resetPassword(email: string, otp: string, newPassword: string) {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            email,
+            otp,
+            newPassword,
+        }),
+    })
+
+    if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || 'Password reset failed')
     }
 
     return response.json()

@@ -62,9 +62,16 @@ export default function LoginPage() {
       // Call the login service
       const response = await login(formData.email, formData.password)
 
-      if(response.token){
+      // Store token for authenticated API requests
+      if (response.token) {
         localStorage.setItem('token', response.token)
       }
+
+      // Store user details for display (name, email, id)
+      if (response.user) {
+        localStorage.setItem('user', JSON.stringify(response.user))
+      }
+
       // Success! Redirect to home page
       navigate('/home')
     } catch (err: any) {
@@ -134,6 +141,13 @@ export default function LoginPage() {
                 onChange={handleChange}
               />
             </div>
+          </div>
+
+          {/* Forgot Password Link */}
+          <div className="flex items-center justify-end">
+            <Link to="/forgot-password" className="text-sm text-[#ff6b35] hover:text-[#e55a2b]">
+              Forgot password?
+            </Link>
           </div>
 
           {/* Submit Button */}

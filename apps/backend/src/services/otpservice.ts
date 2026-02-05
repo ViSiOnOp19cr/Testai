@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import client from './redisclinet';
 
-export const generateOtp=()=>{
+export const generateOtp = () => {
     return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
@@ -12,7 +12,7 @@ export const storeOtp = async (email: string, otp: string, purpose: string) => {
     await client.setex(`attempts:${email}:${purpose}`, 60 * 5, 0);
 }
 
-export const verifyOtp = async (email: string, otp: string, purpose: string) => {
+export const verifyOtp = async (email: string, otp: string, purpose: string, deleteAfterVerify: boolean = true) => {
     try {
         const key = `otp:${email}:${purpose}`;
         const attemptsKey = `attempts:${email}:${purpose}`;
@@ -37,8 +37,6 @@ export const verifyOtp = async (email: string, otp: string, purpose: string) => 
                 message: "otp is wrong"
             }
         }
-        await client.del(key);
-        await client.del(attemptsKey);
         return {
             valid: true,
             message: "otp verified successfully"
@@ -50,14 +48,14 @@ export const verifyOtp = async (email: string, otp: string, purpose: string) => 
         }
     }
 }
-export const checkRateLimit = async(email:string)=>{
+export const checkRateLimit = async (email: string) => {
     const key = `ratelimit:${email}`;
     const count = parseInt(await client.get(key) || '0');
-    if(count >=5){
+    if (count >= 5) {
         return false;
     }
     await client.incr(key);
-    await client.expire(key,60*15);
+    await client.expire(key, 60 * 15);
     return true;
 }
 

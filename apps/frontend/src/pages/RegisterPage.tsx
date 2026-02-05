@@ -89,8 +89,8 @@ export default function RegisterPage() {
   const handleVerifyOtp = async () => {
     setOtpError('')
     
-    if (!otp || otp.length !== 6) {
-      setOtpError('Please enter a valid 6-digit OTP')
+    if (!otp || otp.length !== 4) {
+      setOtpError('Please enter a valid 4-digit OTP')
       return
     }
 
@@ -249,17 +249,17 @@ export default function RegisterPage() {
                     id="otp"
                     name="otp"
                     type="text"
-                    maxLength={6}
+                    maxLength={4}
                     required
                     className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#ff6b35] focus:border-[#ff6b35] focus:z-10 sm:text-sm"
-                    placeholder="Enter 6-digit OTP"
+                    placeholder="Enter 4-digit OTP"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                   />
                   <button
                     type="button"
                     onClick={handleVerifyOtp}
-                    disabled={verifyingOtp || otp.length !== 6}
+                    disabled={verifyingOtp || otp.length !== 4}
                     className="whitespace-nowrap px-4 py-2 bg-[#ff6b35] text-white text-sm font-medium hover:bg-[#e55a2b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ff6b35] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {verifyingOtp ? 'Verifying...' : 'Verify OTP'}

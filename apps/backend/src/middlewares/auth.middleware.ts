@@ -10,11 +10,10 @@ export const auth_middleware = (req: AuthRequest, res: Response, next: NextFunct
         if (!token) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
-        const user = jwt.verify(token, process.env.JWT_SECRET);
-        req.userid = user.id;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+        req.userid = decoded.id;
         next();
     } catch (error) {
-        console.error('Authentication failed:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        return res.status(401).json({ error: 'Unauthorized' });
     }
 }
