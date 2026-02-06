@@ -30,6 +30,12 @@ export async function handleWebhook(req: Request, res: Response) {
     try {
         const event = req.body;
 
+        console.log('🔔 Webhook received:', {
+            type: event.type,
+            id: event.id,
+            timestamp: new Date().toISOString()
+        });
+
         // Log the event for debugging
         await pool.query(
             `INSERT INTO "Payment_Events" (id, event_type, event_data, dodo_event_id)
@@ -38,10 +44,13 @@ export async function handleWebhook(req: Request, res: Response) {
             [uuidv4(), event.type, JSON.stringify(event), event.id]
         );
 
+        console.log(' Event saved to database');
+
         // Handle different event types
         switch (event.type) {
             case 'payment.succeeded':
             case 'checkout.completed':
+                console.log('Processing payment/checkout event');
                 await paymentService.handlePaymentSuccess(event.data);
                 break;
 
@@ -58,6 +67,7 @@ export async function handleWebhook(req: Request, res: Response) {
         res.json({ received: true });
     } catch (error) {
         console.error('Webhook error:', error);
+        console.error('Stack:', error instanceof Error ? error.stack : 'No stack');
         // Still return 200 to prevent Dodo from retrying
         res.json({ received: true, error: 'Processing failed' });
     }

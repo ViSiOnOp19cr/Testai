@@ -40,43 +40,63 @@ export async function createCheckoutSession(userId: string, planType: 'pro' | 'u
 
 // Handle successful payment
 export async function handlePaymentSuccess(paymentData: any) {
-    const { customer_id, subscription_id, metadata } = paymentData;
-    const userId = metadata?.user_id;
-    const planType = metadata?.plan_type;
+    try {
+        // Extract the actual payment data
+        const actualData = paymentData.data || paymentData;
+        const customerId = actualData.customer?.customer_id;
+        const subscriptionId = actualData.subscription_id;
+        const metadata = actualData.metadata;
+        const userId = metadata?.user_id;
+        const planType = metadata?.plan_type;
 
-    if (!userId || !planType) {
-        console.error('Missing user_id or plan_type in payment metadata');
-        return;
+        if (!userId || !planType) {
+            console.error('❌ Missing user_id or plan_type in payment metadata:', metadata);
+            return;
+        }
+
+        const plan = PLANS[planType as keyof typeof PLANS];
+        if (!plan) {
+            console.error(`❌ Invalid plan type: ${planType}`);
+            return;
+        }
+
+        // Calculate subscription dates
+        const startDate = new Date();
+        const endDate = new Date();
+        endDate.setMonth(endDate.getMonth() + 1);
+
+        // Update user plan
+        const updateResult = await pool.query(
+            `UPDATE "User" 
+         SET plan = $1, 
+             monthly_quota = $2,
+             subscription_status = 'active',
+             quota_reset_date = $3,
+             "updatedAt" = NOW()
+         WHERE id = $4
+         RETURNING id, email, plan`,
+            [planType, plan.monthlyRequests, endDate, userId]
+        );
+
+        if (updateResult.rowCount === 0) {
+            console.error('⚠️ User not found for payment:', userId);
+            return;
+        }
+
+        // Create subscription record
+        await pool.query(
+            `INSERT INTO "Subscriptions" 
+         (id, user_id, plan_type, amount, payment_status, dodo_subscription_id, dodo_customer_id, start_date, end_date)
+         VALUES ($1, $2, $3, $4, 'succeeded', $5, $6, $7, $8)`,
+            [uuidv4(), userId, planType, plan.price, subscriptionId, customerId, startDate, endDate]
+        );
+
+        console.log(`✅ Payment processed: User ${updateResult.rows[0].email} upgraded to ${planType}`);
+
+    } catch (error) {
+        console.error('❌ Payment processing error:', error);
+        throw error;
     }
-
-    const plan = PLANS[planType as keyof typeof PLANS];
-
-    // Calculate subscription dates
-    const startDate = new Date();
-    const endDate = new Date();
-    endDate.setMonth(endDate.getMonth() + 1);
-
-    // Update user plan
-    await pool.query(
-        `UPDATE "User" 
-     SET plan = $1, 
-         monthly_quota = $2,
-         subscription_status = 'active',
-         quota_reset_date = $3,
-         "updatedAt" = NOW()
-     WHERE id = $4`,
-        [planType, plan.monthlyRequests, endDate, userId]
-    );
-
-    // Create subscription record
-    await pool.query(
-        `INSERT INTO "Subscriptions" 
-     (id, user_id, plan_type, amount, payment_status, dodo_subscription_id, dodo_customer_id, start_date, end_date)
-     VALUES ($1, $2, $3, $4, 'succeeded', $5, $6, $7, $8)`,
-        [uuidv4(), userId, planType, plan.price, subscription_id, customer_id, startDate, endDate]
-    );
-
-    console.log(`✅ Payment processed for user ${userId}, plan: ${planType}`);
 }
 
 // Get user's subscription status
