@@ -1,6 +1,6 @@
 {
     "name": "tstai",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "TSTAI - AI-powered natural language API testing CLI with custom API key authentication. Write tests in plain English and run them via CLI.",
     "main": "src/index.js",
     "bin": {

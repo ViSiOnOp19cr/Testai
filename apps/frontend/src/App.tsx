@@ -6,6 +6,8 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import HomePage from './pages/HomePage'
 import ProjectsPage from './pages/ProjectsPage'
 import DocsPage from './pages/DocsPage'
+import PricingPage from './pages/PricingPage'
+import SubscriptionPage from './pages/SubscriptionPage'
 
 /**
  * App Component - Root component with routing configuration
@@ -21,6 +23,8 @@ import DocsPage from './pages/DocsPage'
  * - /home : Main dashboard (protected, requires authentication)
  * - /projects : API key management page (protected)
  * - /docs : Documentation page (protected)
+ * - /pricing : Pricing and plan selection page (protected)
+ * - /subscription : Subscription management and usage dashboard (protected)
  */
 
 function App() {
@@ -38,8 +42,11 @@ function App() {
       <Route path="/home" element={<HomePage />} />
       <Route path="/projects" element={<ProjectsPage />} />
       <Route path="/docs" element={<DocsPage />} />
+      <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/subscription" element={<SubscriptionPage />} />
     </Routes>
   )
 }
 
 export default App
+

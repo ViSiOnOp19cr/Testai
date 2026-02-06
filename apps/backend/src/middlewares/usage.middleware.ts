@@ -7,7 +7,7 @@ export const checkQuota = async (
   res: Response,
   next: NextFunction
 ) => {
-  const userId = req.user.id;
+  const userId = req.userid;
 
   try {
     const userResult = await pool.query(
