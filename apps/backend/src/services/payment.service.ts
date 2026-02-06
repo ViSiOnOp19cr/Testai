@@ -14,10 +14,14 @@ export async function createCheckoutSession(userId: string, planType: 'pro' | 'u
         }
 
         // Create checkout with Dodo
-        const checkout = await dodoClient.checkouts.create({
-            product_id: productId,
-            success_url: `${process.env.FRONTEND_URL}/payment/success`,
-            cancel_url: `${process.env.FRONTEND_URL}/payment/cancel`,
+        const checkout = await dodoClient.checkoutSessions.create({
+            product_cart: [
+                {
+                    product_id: productId,
+                    quantity: 1,
+                },
+            ],
+            return_url: `${process.env.FRONTEND_URL}/payment/success`,
             metadata: {
                 user_id: userId,
                 plan_type: planType,
@@ -25,8 +29,8 @@ export async function createCheckoutSession(userId: string, planType: 'pro' | 'u
         });
 
         return {
-            checkoutUrl: checkout.url,
-            checkoutId: checkout.id,
+            checkoutUrl: checkout.checkout_url || '',
+            checkoutId: checkout.session_id,
         };
     } catch (error) {
         console.error('Checkout creation failed:', error);
