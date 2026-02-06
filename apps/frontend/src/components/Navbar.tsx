@@ -71,6 +71,12 @@ export default function Navbar({ userName, onLogout }: NavbarProps) {
               >
                 Projects
               </Link>
+              <Link
+                to="/subscription"
+                className={`${isActive('/subscription')} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors`}
+              >
+                Billing
+              </Link>
             </div>
           </div>
           

@@ -10,7 +10,7 @@ const getAuthToken = () => {
 export async function createCheckout(planType: 'pro' | 'ultra') {
     const token = getAuthToken();
 
-    const response = await fetch(`${API_URL}/v1/payment/checkout`, {
+    const response = await fetch(`${API_URL}/payment/checkout`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ export async function createCheckout(planType: 'pro' | 'ultra') {
 export async function getSubscription() {
     const token = getAuthToken();
 
-    const response = await fetch(`${API_URL}/v1/payment/subscription`, {
+    const response = await fetch(`${API_URL}/payment/subscription`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -50,7 +50,7 @@ export async function getSubscription() {
 export async function cancelSubscription() {
     const token = getAuthToken();
 
-    const response = await fetch(`${API_URL}/v1/payment/cancel`, {
+    const response = await fetch(`${API_URL}/payment/cancel`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -69,7 +69,7 @@ export async function cancelSubscription() {
 export async function getUsage() {
     const token = getAuthToken();
 
-    const response = await fetch(`${API_URL}/v1/payment/usage`, {
+    const response = await fetch(`${API_URL}/payment/usage`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
