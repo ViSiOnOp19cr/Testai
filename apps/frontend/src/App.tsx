@@ -8,6 +8,8 @@ import ProjectsPage from './pages/ProjectsPage'
 import DocsPage from './pages/DocsPage'
 import PricingPage from './pages/PricingPage'
 import SubscriptionPage from './pages/SubscriptionPage'
+import PaymentSuccessPage from './pages/PaymentSuccessPage'
+import PaymentCancelPage from './pages/PaymentCancelPage'
 
 /**
  * App Component - Root component with routing configuration
@@ -44,6 +46,10 @@ function App() {
       <Route path="/docs" element={<DocsPage />} />
       <Route path="/pricing" element={<PricingPage />} />
       <Route path="/subscription" element={<SubscriptionPage />} />
+      
+      {/* Payment callback routes */}
+      <Route path="/payment/success" element={<PaymentSuccessPage />} />
+      <Route path="/payment/cancel" element={<PaymentCancelPage />} />
     </Routes>
   )
 }

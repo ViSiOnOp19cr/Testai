@@ -7,7 +7,8 @@ export const checkQuota = async (
   res: Response,
   next: NextFunction
 ) => {
-  const userId = req.userid;
+  const userId = req.userid || req.user?.id;
+
 
   try {
     const userResult = await pool.query(
@@ -19,14 +20,14 @@ export const checkQuota = async (
     const user = userResult.rows[0];
 
     if (user.subscription_status !== 'active') {
-      return res.status(403).json({ 
-        error: 'Subscription inactive. Please renew.' 
+      return res.status(403).json({
+        error: 'Subscription inactive. Please renew.'
       });
     }
 
     const today = new Date();
     const resetDate = new Date(user.quota_reset_date);
-    
+
     if (today >= resetDate) {
       await pool.query(
         `UPDATE "User" 
