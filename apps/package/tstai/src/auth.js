@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 // Configuration for the custom API
 const API_CONFIG = {
-  baseUrl: 'https://tstai-backend--s7q4sfe.salmonisland-38339984.southindia.azurecontainerapps.io',
+  baseUrl: "https://tstai-backend.salmonisland-38339984.southindia.azurecontainerapps.io",
   endpoints: {
     parse: '/v1/llm/parse',
     whoami: '/v1/auth/whoami'

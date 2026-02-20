@@ -64,9 +64,7 @@ export const login = async (req: Request, res: Response) => {
 
     const token = jwt.sign({
       id: user.id,
-    }, process.env.JWT_SECRET!, {
-      expiresIn: '1h'
-    });
+    }, process.env.JWT_SECRET!);
 
     res.json({
       message: "logged in successfully",
@@ -88,7 +86,6 @@ export async function whoami(req: Request, res: Response) {
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-
     res.json({
       id: user.id,
       email: user.email,
@@ -99,6 +96,7 @@ export async function whoami(req: Request, res: Response) {
     res.status(500).json({ error: 'Failed to get user info' });
   }
 }
+
 export const updatePassword = async (req: AuthRequest, res: Response) => {
   try {
     const { email, newPassword } = req.body;
@@ -121,6 +119,7 @@ export const updatePassword = async (req: AuthRequest, res: Response) => {
     });
   }
 }
+
 export const resetPassword = async (req: Request, res: Response) => {
   try {
     const { email, otp, newPassword } = req.body;

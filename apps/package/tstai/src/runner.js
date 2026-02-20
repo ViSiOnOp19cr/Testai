@@ -1,11 +1,14 @@
-import { getTests } from "./index.js";
+import { getTests, clearTests } from "./index.js";
 import { parseInstruction } from "./parser.js";
 import axios from "axios";
 import { logResult, ensureTestLogsDirectory, generateLogFileName, writeTestLogs } from "./logger.js";
 
-export async function runTestsFromFile(filePath, options={}) {
+export async function runTestsFromFile(filePath, options = {}) {
   console.log(`\n🚀 Running tests from: ${filePath}\n`);
-  
+
+  // Clear any previously loaded tests
+  clearTests();
+
   await import(filePath); // load user's test file
   const tests = getTests();
 
@@ -36,37 +39,37 @@ export async function runTestsFromFile(filePath, options={}) {
 
     const passed = res.status === plan.expected_status;
     logResult(plan, res, passed);
-    
+
     // Count passed/failed tests
     if (passed) {
       passedCount++;
     } else {
       failedCount++;
     }
-    
+
     const testData = {
-      testNumber: i+1,
+      testNumber: i + 1,
       instruction: t.instruction,
-      request:{
-        method : plan.method,
-        url:url,
-        headers:requestHeaders,
-        payload:plan.payload,
-        baseurl:t.baseurl,
-        endpoint:plan.endpoint
+      request: {
+        method: plan.method,
+        url: url,
+        headers: requestHeaders,
+        payload: plan.payload,
+        baseurl: t.baseurl,
+        endpoint: plan.endpoint
       },
-      response:{
-        status:res.status,
-        statusText:res.statusText,
-        headers:res.headers,
-        data:res.data,
-        responseTime:responseTime
+      response: {
+        status: res.status,
+        statusText: res.statusText,
+        headers: res.headers,
+        data: res.data,
+        responseTime: responseTime
       },
       result: passed ? "PASSED" : "FAILED",
-      expectedStatus:plan.expected_status,
-      actualStatus:res.status
+      expectedStatus: plan.expected_status,
+      actualStatus: res.status
     }
-    
+
     results.push(testData);
   }
 
@@ -77,7 +80,7 @@ export async function runTestsFromFile(filePath, options={}) {
   console.log(`✅ Passed: ${passedCount}`);
   console.log(`❌ Failed: ${failedCount}`);
   console.log(`Success Rate: ${((passedCount / tests.length) * 100).toFixed(1)}%`);
-  
+
   if (failedCount > 0) {
     console.log("\n🔍 Failed Tests:");
     results.filter(r => r.result === "FAILED").forEach((result, index) => {
@@ -85,20 +88,20 @@ export async function runTestsFromFile(filePath, options={}) {
       console.log(`   Expected: ${result.expectedStatus}, Got: ${result.actualStatus}`);
     });
   }
-  
+
   console.log("=".repeat(50));
-  
+
   // Write logs if requested
-  if(options.logs || options.logsFailed){
+  if (options.logs || options.logsFailed) {
     try {
       const testLogsDir = ensureTestLogsDirectory();
-      
+
       // Filter results if only failed logs are requested
       let filteredResults = results;
-      if(options.logsFailed && !options.logs){
+      if (options.logsFailed && !options.logs) {
         filteredResults = results.filter(r => r.result === "FAILED");
       }
-      
+
       const logData = {
         testRunId: generateLogFileName().replace('.json', ''),
         timestamp: new Date().toISOString(),

@@ -1,4 +1,4 @@
--- Create User table
+-- Create Use table
 CREATE TABLE IF NOT EXISTS "User" (
     id TEXT PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
@@ -29,10 +29,9 @@ EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
--- Update User table to use PLAN enum
--- First, remove the default
+
 ALTER TABLE "User" ALTER COLUMN plan DROP DEFAULT;
--- Then change the type
+
 ALTER TABLE "User" ALTER COLUMN plan TYPE "PLAN" USING plan::"PLAN";
--- Finally, set the default with explicit cast
+
 ALTER TABLE "User" ALTER COLUMN plan SET DEFAULT 'free'::"PLAN";

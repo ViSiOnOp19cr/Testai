@@ -27,7 +27,5 @@ export function validateDodoConfig() {
         console.warn('Payment features will not work until these are set.');
         return false;
     }
-
-    console.log('✅ Dodo Payments configured');
     return true;
 }

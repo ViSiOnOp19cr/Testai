@@ -9,7 +9,7 @@ export const storeOtp = async (email: string, otp: string, purpose: string) => {
     const key = `otp:${email}:${purpose}`;
     const hashedkey = await bcrypt.hash(otp, 10);
     await client.setex(key, 60 * 5, hashedkey);
-    await client.setex(`attempts:${email}:${purpose}`, 60 * 5, 0);
+    await client.setex(`attempts:${email}:${purpose}`, 60 * 5, '0');
 }
 
 export const verifyOtp = async (email: string, otp: string, purpose: string, deleteAfterVerify: boolean = true) => {
